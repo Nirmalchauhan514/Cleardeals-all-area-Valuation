@@ -72,10 +72,9 @@ if st.button("Generate Valuation Report"):
                 "Disclaimer: This report is indicative based on market data as of Aug 2025. "
                 "Please consult licensed valuers. Powered by ClearDeals"), align="C")
 
-    pdf = FPDF()
+    pdf = PDF()
     pdf.add_page()
     pdf.set_font("Arial", size=11)
-    pdf.cell(200, 10, txt="ClearDeals Valuation Report", ln=True, align='C')
     pdf.multi_cell(0, 8,
         f"Name: {name}\nContact: {contact}\nCity: {city}\nArea: {area}\n"
         f"BHK/Type: {bhk}\nFurnishing: {furnishing}\nAmenities: {', '.join(amenity_sel) if amenity_sel else 'None'}\n"
@@ -93,10 +92,16 @@ if st.button("Generate Valuation Report"):
     pdf.image(tmp_path, x=20, w=170)
     os.remove(tmp_path)
 
-pdf_bytes = BytesIO()
-pdf_output = pdf.output(dest='S').encode('latin1')  # Returns string → encode to bytes
-pdf_bytes.write(pdf_output)
-pdf_bytes.seek(0)
-st.download_button(label="Download Report", data=pdf_output, file_name="valuation_report.pdf", mime='application/pdf')
+    # Output PDF to bytes
+    pdf_bytes = BytesIO()
+    pdf_output = pdf.output(dest='S').encode('latin1')
+    pdf_bytes.write(pdf_output)
+    pdf_bytes.seek(0)
 
-
+    # Download button
+    st.download_button(
+        label="📄 Download Report",
+        data=pdf_bytes,
+        file_name="valuation_report.pdf",
+        mime="application/pdf"
+    )
