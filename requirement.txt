@@ -4,3 +4,4 @@ python-docx
 fpdf==1.7.2
 matplotlib
 fpdf2
+fpdf
