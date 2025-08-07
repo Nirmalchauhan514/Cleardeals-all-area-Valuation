@@ -96,5 +96,6 @@ pdf_bytes = BytesIO()
 pdf_output = pdf.output(dest='S').encode('latin1')  # Returns string → encode to bytes
 pdf_bytes.write(pdf_output)
 pdf_bytes.seek(0)
+st.download_button(label="Download Report", data=pdf_output, file_name="valuation_report.pdf", mime='application/pdf')
 
 
