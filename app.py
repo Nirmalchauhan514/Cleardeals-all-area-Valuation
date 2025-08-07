@@ -75,6 +75,7 @@ if st.button("Generate Valuation Report"):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=11)
+    pdf.cell(200, 10, txt="ClearDeals Valuation Report", ln=True, align='C')
     pdf.multi_cell(0, 8,
         f"Name: {name}\nContact: {contact}\nCity: {city}\nArea: {area}\n"
         f"BHK/Type: {bhk}\nFurnishing: {furnishing}\nAmenities: {', '.join(amenity_sel) if amenity_sel else 'None'}\n"
