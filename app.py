@@ -30,7 +30,7 @@ areas = {
     ]
 }
 
-# Price ranges per area
+# Price ranges per area (base rate)
 price_ranges = {
     "Ahmedabad": {
         "Bopal": 6500, "South Bopal": 6800, "Ambli": 9500, "Shilaj": 7200, "Gota": 6200,
@@ -82,9 +82,24 @@ size = st.number_input("Property Size (sq.ft.)", min_value=100, step=50)
 # Valuation
 if st.button("Generate Valuation Report"):
     rate = price_ranges[city][area]
-    low = rate * 0.9
-    avg = rate
-    high = rate * 1.1
+
+    # Adjustments
+    furnishing_adj = {"Fully Furnished": 1.05, "Semi Furnished": 1.03, "Unfurnished": 1.0}[furnishing]
+    age_adj = {
+        "New Property": 1.05, "0-5 years": 1.03, "5-10 years": 1.0,
+        "10-20 years": 0.97, "20+ years": 0.93
+    }[age_of_property]
+    overlooking_adj = {
+        "Garden": 1.02, "Pool": 1.03, "Main Road": 1.0,
+        "Park": 1.02, "Club": 1.01, "Others": 1.0
+    }[overlooking]
+    amenity_adj = 1 + (0.01 * len(amenity_sel))  # +1% for each amenity
+
+    adjusted_rate = rate * furnishing_adj * age_adj * overlooking_adj * amenity_adj
+
+    low = adjusted_rate * 0.9
+    avg = adjusted_rate
+    high = adjusted_rate * 1.1
 
     val_low = low * size
     val_avg = avg * size
@@ -100,7 +115,7 @@ if st.button("Generate Valuation Report"):
     ax.set_title("Valuation Price Range")
     st.pyplot(fig)
 
-    # PDF class with Arial font
+    # PDF class
     class PDF(FPDF):
         def header(self):
             self.set_font("Arial", "B", 14)
@@ -120,7 +135,8 @@ if st.button("Generate Valuation Report"):
         f"Name: {name}\nContact: {contact}\nCity: {city}\nArea: {area}\n"
         f"BHK/Type: {bhk}\nFurnishing: {furnishing}\nAge of Property: {age_of_property}\n"
         f"Overlooking: {overlooking}\nAmenities: {', '.join(amenity_sel) if amenity_sel else 'None'}\n"
-        f"Size (sq.ft.): {size}\n\nEstimated Value: Rs.{val_avg:,.0f}\nPrice Range: Rs.{val_low:,.0f} - Rs.{val_high:,.0f}"
+        f"Size (sq.ft.): {size}\n\nBase Rate: Rs.{rate:,.0f}/sq.ft.\nAdjusted Rate: Rs.{adjusted_rate:,.0f}/sq.ft.\n"
+        f"Estimated Value: Rs.{val_avg:,.0f}\nPrice Range: Rs.{val_low:,.0f} - Rs.{val_high:,.0f}"
     )
 
     # Save chart as image
@@ -134,13 +150,12 @@ if st.button("Generate Valuation Report"):
     pdf.image(tmp_path, x=20, w=170)
     os.remove(tmp_path)
 
-    # Output PDF to bytes
+    # Output PDF
     pdf_bytes = BytesIO()
     pdf_output = pdf.output(dest='S').encode('latin1')
     pdf_bytes.write(pdf_output)
     pdf_bytes.seek(0)
 
-    # Download button
     st.download_button(
         label="📄 Download Report",
         data=pdf_bytes,
