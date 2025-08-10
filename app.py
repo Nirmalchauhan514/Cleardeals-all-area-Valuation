@@ -61,6 +61,8 @@ price_ranges = {
 
 furnish_options = ["Fully Furnished", "Semi Furnished", "Unfurnished"]
 amenities = ["Swimming Pool", "Garden", "Gym", "Secured", "Covered Parking", "Club House"]
+age_options = ["New Property", "0-5 years", "5-10 years", "10-20 years", "20+ years"]
+overlooking_options = ["Garden", "Pool", "Main Road", "Park", "Club", "Others"]
 
 st.set_page_config(page_title="Multi-City Valuation Tool", layout="centered")
 st.title("ClearDeals Property Valuation Tool")
@@ -72,6 +74,8 @@ city = st.selectbox("City", list(areas.keys()))
 area = st.selectbox("Area", areas[city])
 furnishing = st.selectbox("Furnishing Level", furnish_options)
 amenity_sel = st.multiselect("Amenities", amenities)
+age_of_property = st.selectbox("Age of Property", age_options)
+overlooking = st.selectbox("Overlooking", overlooking_options)
 bhk = st.selectbox("Property Type / BHK", ["1 BHK", "2 BHK", "3 BHK", "Villa", "Commercial"])
 size = st.number_input("Property Size (sq.ft.)", min_value=100, step=50)
 
@@ -114,7 +118,8 @@ if st.button("Generate Valuation Report"):
     pdf.set_font("Arial", size=11)
     pdf.multi_cell(0, 8,
         f"Name: {name}\nContact: {contact}\nCity: {city}\nArea: {area}\n"
-        f"BHK/Type: {bhk}\nFurnishing: {furnishing}\nAmenities: {', '.join(amenity_sel) if amenity_sel else 'None'}\n"
+        f"BHK/Type: {bhk}\nFurnishing: {furnishing}\nAge of Property: {age_of_property}\n"
+        f"Overlooking: {overlooking}\nAmenities: {', '.join(amenity_sel) if amenity_sel else 'None'}\n"
         f"Size (sq.ft.): {size}\n\nEstimated Value: Rs.{val_avg:,.0f}\nPrice Range: Rs.{val_low:,.0f} - Rs.{val_high:,.0f}"
     )
 
